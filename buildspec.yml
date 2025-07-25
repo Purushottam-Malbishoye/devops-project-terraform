@@ -5,12 +5,10 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
-      - cd vite-project
       - npm ci
 
   pre_build:
     commands:
-      - cd vite-project
       - echo Logging in to Amazon ECR...
       - $(aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com)
       - export REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
@@ -18,14 +16,12 @@ phases:
 
   build:
     commands:
-      - cd vite-project
       - npm run build
       - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
       - docker tag $REPOSITORY_URI:$IMAGE_TAG $REPOSITORY_URI:latest
 
   post_build:
     commands:
-      - cd vite-project
       - echo Pushing Docker images...
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - docker push $REPOSITORY_URI:latest
@@ -33,4 +29,4 @@ phases:
 
 artifacts:
   files:
-    - vite-project/imagedefinitions.json
+    - imagedefinitions.json
